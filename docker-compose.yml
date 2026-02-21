@@ -1,0 +1,11 @@
+services:
+  giraf-ai:
+    build: .
+    ports:
+      - "8100:8100"
+    environment:
+      - JWT_SECRET=${JWT_SECRET:-change-me}
+      - IMAGE_PROVIDER=${IMAGE_PROVIDER:-mock}
+      - TTS_PROVIDER=${TTS_PROVIDER:-mock}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GOOGLE_TTS_CREDENTIALS=${GOOGLE_TTS_CREDENTIALS:-}
