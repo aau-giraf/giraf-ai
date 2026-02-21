@@ -1,0 +1,60 @@
+# giraf-ai
+
+Shared AI microservice for the GIRAF platform. Provides image generation and text-to-speech behind provider-agnostic interfaces.
+
+## Stack
+
+- Python 3.12+, FastAPI, uv
+- Stateless — no database
+
+## Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/generate/image` | Generate image from prompt |
+| POST | `/api/v1/tts` | Text-to-speech synthesis |
+| GET | `/api/v1/tts/voices` | List available voices |
+| GET | `/api/v1/health` | Provider health status |
+
+All endpoints except `/health` require a Core-issued JWT (`Authorization: Bearer <token>`).
+
+## Providers
+
+Configured via environment variables. Falls back to mock adapters when no keys are set.
+
+| Capability | Provider | Env var |
+|------------|----------|---------|
+| Image | OpenAI DALL-E | `IMAGE_PROVIDER=openai_dalle`, `OPENAI_API_KEY` |
+| TTS | Google Cloud TTS | `TTS_PROVIDER=google_tts`, `GOOGLE_TTS_CREDENTIALS` |
+
+## Running
+
+```bash
+uv sync
+uv run python main.py          # http://localhost:8100
+```
+
+Or with Docker:
+
+```bash
+docker compose up
+```
+
+## Tests
+
+```bash
+uv sync --all-extras
+uv run pytest
+```
+
+## Environment
+
+| Variable | Required | Default |
+|----------|----------|---------|
+| `JWT_SECRET` | Yes | — |
+| `IMAGE_PROVIDER` | No | `mock` |
+| `TTS_PROVIDER` | No | `mock` |
+| `OPENAI_API_KEY` | If using DALL-E | — |
+| `GOOGLE_TTS_CREDENTIALS` | If using Google TTS | — |
+| `HOST` | No | `0.0.0.0` |
+| `PORT` | No | `8100` |
