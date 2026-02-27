@@ -3,3 +3,10 @@ __pycache__/
 .venv/
 .pytest_cache/
 *.egg-info/
+
+# LLM / AI tool files
+CLAUDE.md
+.claude/
+.cursor/
+.cursorrules
+.github/copilot-instructions.md

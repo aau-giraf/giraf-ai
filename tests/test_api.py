@@ -1,4 +1,7 @@
-def test_health(client):
+from fastapi.testclient import TestClient
+
+
+def test_health(client: TestClient) -> None:
     resp = client.get("/api/v1/health")
     assert resp.status_code == 200
     data = resp.json()
@@ -7,12 +10,12 @@ def test_health(client):
     assert data["providers"]["tts"] is True
 
 
-def test_generate_image_requires_auth(client):
+def test_generate_image_requires_auth(client: TestClient) -> None:
     resp = client.post("/api/v1/generate/image", json={"prompt": "test"})
     assert resp.status_code == 401
 
 
-def test_generate_image(client, auth_header):
+def test_generate_image(client: TestClient, auth_header: dict[str, str]) -> None:
     resp = client.post(
         "/api/v1/generate/image",
         json={"prompt": "lasagna"},
@@ -25,7 +28,7 @@ def test_generate_image(client, auth_header):
     assert data["provider"] == "mock"
 
 
-def test_tts_synthesize(client, auth_header):
+def test_tts_synthesize(client: TestClient, auth_header: dict[str, str]) -> None:
     resp = client.post(
         "/api/v1/tts",
         json={"text": "Lasagne", "language": "da"},
@@ -37,13 +40,13 @@ def test_tts_synthesize(client, auth_header):
     assert data["provider"] == "mock"
 
 
-def test_tts_voices(client, auth_header):
+def test_tts_voices(client: TestClient, auth_header: dict[str, str]) -> None:
     resp = client.get("/api/v1/tts/voices?language=da", headers=auth_header)
     assert resp.status_code == 200
     voices = resp.json()
     assert len(voices) >= 1
 
 
-def test_tts_requires_auth(client):
+def test_tts_requires_auth(client: TestClient) -> None:
     resp = client.post("/api/v1/tts", json={"text": "test"})
     assert resp.status_code == 401

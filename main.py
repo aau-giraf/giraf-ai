@@ -1,8 +1,10 @@
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI
 
+from adapters.image.gemini import GeminiImageAdapter
 from adapters.image.mock import MockImageAdapter
 from adapters.image.openai_dalle import OpenAIDalleAdapter
 from adapters.tts.google_tts import GoogleTTSAdapter
@@ -11,6 +13,7 @@ from api.health import router as health_router
 from api.image import router as image_router
 from api.tts import router as tts_router
 from config.settings import settings
+from core.ports import ImageGeneratorPort, TTSPort
 from services.image_service import ImageService
 from services.tts_service import TTSService
 
@@ -18,14 +21,20 @@ app_state: dict[str, Any] = {}
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Image adapter
+    image_adapter: ImageGeneratorPort
     if settings.image_provider == "openai_dalle":
         image_adapter = OpenAIDalleAdapter(api_key=settings.openai_api_key)
+    elif settings.image_provider == "gemini":
+        image_adapter = GeminiImageAdapter(
+            api_key=settings.gemini_api_key, model=settings.gemini_model
+        )
     else:
         image_adapter = MockImageAdapter()
 
     # TTS adapter
+    tts_adapter: TTSPort
     if settings.tts_provider == "google_tts":
         tts_adapter = GoogleTTSAdapter(api_key=settings.google_tts_credentials)
     else:

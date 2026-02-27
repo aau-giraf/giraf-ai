@@ -36,9 +36,9 @@ class ImageService:
         if result.format == request.format:
             img = Image.open(io.BytesIO(result.image_data))
             if img.size != request.size:
-                img = img.resize(request.size, Image.LANCZOS)
+                resized = img.resize(request.size, Image.Resampling.LANCZOS)
                 buf = io.BytesIO()
                 pil_fmt = "PNG" if request.format == "png" else "WEBP"
-                img.save(buf, format=pil_fmt)
+                resized.save(buf, format=pil_fmt)
                 return replace(result, image_data=buf.getvalue())
         return result

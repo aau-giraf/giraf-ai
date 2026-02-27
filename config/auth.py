@@ -28,4 +28,5 @@ def get_org_roles(user: dict[str, Any] = Depends(get_current_user)) -> dict[str,
     raw = user.get("org_roles", {})
     if isinstance(raw, str):
         raw = json.loads(raw)
-    return raw
+    result: dict[str, str] = raw
+    return result

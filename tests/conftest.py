@@ -1,4 +1,5 @@
 import sys
+from collections.abc import Generator
 from pathlib import Path
 
 import jwt
@@ -12,14 +13,14 @@ from config.settings import settings  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
-def _mock_settings(monkeypatch):
+def _mock_settings(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(settings, "jwt_secret", "test-secret")
     monkeypatch.setattr(settings, "image_provider", "mock")
     monkeypatch.setattr(settings, "tts_provider", "mock")
 
 
 @pytest.fixture
-def auth_header():
+def auth_header() -> dict[str, str]:
     token = jwt.encode(
         {"sub": "1", "org_roles": {"1": "member"}},
         "test-secret",
@@ -29,7 +30,7 @@ def auth_header():
 
 
 @pytest.fixture
-def client():
+def client() -> Generator[TestClient]:
     from main import app
 
     with TestClient(app) as c:

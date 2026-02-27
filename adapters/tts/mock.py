@@ -1,5 +1,5 @@
-import struct
 import io
+import struct
 
 from core.ports import TTSPort
 from core.types import TTSRequest, TTSResult, VoiceInfo
@@ -37,7 +37,9 @@ class MockTTSAdapter(TTSPort):
 
     async def list_voices(self, language: str | None = None) -> list[VoiceInfo]:
         voices = [
-            VoiceInfo(id="mock-da-female", name="Mock Danish Female", language="da", gender="female"),
+            VoiceInfo(
+                id="mock-da-female", name="Mock Danish Female", language="da", gender="female"
+            ),
             VoiceInfo(id="mock-en-male", name="Mock English Male", language="en", gender="male"),
         ]
         if language:
