@@ -17,7 +17,7 @@ _ASPECT_RATIO_MAP = {
 
 
 class GeminiImageAdapter(ImageGeneratorPort):
-    def __init__(self, api_key: str, model: str = "gemini-2.5-flash") -> None:
+    def __init__(self, api_key: str, model: str = "gemini-2.5-flash-image") -> None:
         self._model = model
         self._client = httpx.AsyncClient(
             base_url="https://generativelanguage.googleapis.com/v1beta",
@@ -33,7 +33,7 @@ class GeminiImageAdapter(ImageGeneratorPort):
                 json={
                     "contents": [{"parts": [{"text": request.prompt}]}],
                     "generationConfig": {
-                        "responseModalities": ["IMAGE"],
+                        "responseModalities": ["TEXT", "IMAGE"],
                         "imageConfig": {"aspectRatio": aspect_ratio},
                     },
                 },

@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from adapters.image.gemini import GeminiImageAdapter
 from adapters.image.mock import MockImageAdapter
 from adapters.image.openai_dalle import OpenAIDalleAdapter
+from adapters.tts.gemini_tts import GeminiTTSAdapter
 from adapters.tts.google_tts import GoogleTTSAdapter
 from adapters.tts.mock import MockTTSAdapter
 from api.health import router as health_router
@@ -37,6 +38,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     tts_adapter: TTSPort
     if settings.tts_provider == "google_tts":
         tts_adapter = GoogleTTSAdapter(api_key=settings.google_tts_credentials)
+    elif settings.tts_provider == "gemini_tts":
+        tts_adapter = GeminiTTSAdapter(
+            api_key=settings.gemini_api_key, model=settings.gemini_tts_model
+        )
     else:
         tts_adapter = MockTTSAdapter()
 

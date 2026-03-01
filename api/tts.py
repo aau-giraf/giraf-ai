@@ -53,6 +53,5 @@ async def list_voices(
     service = _get_tts_service()
     voices = await service.list_voices(language)
     return [
-        VoiceResponse(id=v.id, name=v.name, language=v.language, gender=v.gender)
-        for v in voices
+        VoiceResponse(id=v.id, name=v.name, language=v.language, gender=v.gender) for v in voices
     ]
