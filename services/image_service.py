@@ -1,24 +1,27 @@
 import io
 from dataclasses import replace
+from pathlib import Path
 
 from PIL import Image
 
 from core.ports import ImageGeneratorPort
 from core.types import ImageGenerationRequest, ImageGenerationResult
 
-STYLE_PROMPTS = {
-    "pictogram": (
-        "A simple, flat, colorful pictogram icon of {prompt}. "
-        "White background, no text, suitable for children with autism."
-    ),
-    "realistic": "A photorealistic image of {prompt}.",
-    "cartoon": "A friendly cartoon illustration of {prompt}, suitable for children.",
-}
+_PROMPTS_DIR = Path(__file__).resolve().parent.parent / "prompts" / "image"
+
+
+def _load_style_prompts() -> dict[str, str]:
+    prompts: dict[str, str] = {}
+    if _PROMPTS_DIR.is_dir():
+        for f in _PROMPTS_DIR.glob("*.md"):
+            prompts[f.stem] = f.read_text().strip()
+    return prompts
 
 
 class ImageService:
     def __init__(self, adapter: ImageGeneratorPort) -> None:
         self.adapter = adapter
+        self._style_prompts = _load_style_prompts()
 
     async def generate(self, request: ImageGenerationRequest) -> ImageGenerationResult:
         enriched = self._build_prompt(request)
@@ -26,7 +29,7 @@ class ImageService:
         return self._post_process(result, request)
 
     def _build_prompt(self, request: ImageGenerationRequest) -> ImageGenerationRequest:
-        template = STYLE_PROMPTS.get(request.style, "{prompt}")
+        template = self._style_prompts.get(request.style, "{prompt}")
         enriched_prompt = template.format(prompt=request.prompt)
         return replace(request, prompt=enriched_prompt)
 

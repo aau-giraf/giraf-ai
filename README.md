@@ -49,6 +49,23 @@ uv sync --all-extras
 uv run pytest
 ```
 
+## Prompt Templates
+
+Prompt templates live in `prompts/` as plain markdown files. They are loaded once at startup — edit and restart to apply changes.
+
+```
+prompts/
+├── image/
+│   ├── pictogram.md    # style="pictogram" (default)
+│   ├── realistic.md    # style="realistic"
+│   └── cartoon.md      # style="cartoon"
+└── tts/
+    └── default.md      # applied to all TTS requests
+```
+
+- **Image**: filename stem maps to the `style` parameter. Use `{prompt}` as the placeholder for the user's input. Drop in a new `.md` file to add a style.
+- **TTS**: `default.md` wraps all TTS text. Use `{text}` as the placeholder. Currently a passthrough.
+
 ## Environment
 
 | Variable | Required | Default |
