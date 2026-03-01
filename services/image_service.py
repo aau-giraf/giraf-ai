@@ -23,6 +23,9 @@ class ImageService:
         self.adapter = adapter
         self._style_prompts = _load_style_prompts()
 
+    async def health_check(self) -> bool:
+        return await self.adapter.health_check()
+
     async def generate(self, request: ImageGenerationRequest) -> ImageGenerationResult:
         enriched = self._build_prompt(request)
         result = await self.adapter.generate(enriched)

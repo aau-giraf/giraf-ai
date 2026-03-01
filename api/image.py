@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import base64
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from api.schemas import ImageGenerateRequest, ImageGenerateResponse
 from config.auth import get_org_roles
@@ -13,19 +13,16 @@ from services.image_service import ImageService
 router = APIRouter(prefix="/api/v1/generate", tags=["image"])
 
 
-def _get_image_service() -> ImageService:
-    from main import app_state
-
-    service: ImageService = app_state["image_service"]
-    return service
+def get_image_service(request: Request) -> ImageService:
+    return request.app.state.image_service  # type: ignore[no-any-return]
 
 
 @router.post("/image", response_model=ImageGenerateResponse)
 async def generate_image(
     body: ImageGenerateRequest,
     _org_roles: dict[str, str] = Depends(get_org_roles),
+    service: ImageService = Depends(get_image_service),
 ) -> ImageGenerateResponse:
-    service = _get_image_service()
     request = ImageGenerationRequest(
         prompt=body.prompt,
         style=body.style,

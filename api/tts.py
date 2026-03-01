@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import base64
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from api.schemas import TTSSynthesizeRequest, TTSSynthesizeResponse, VoiceResponse
 from config.auth import get_org_roles
@@ -13,19 +13,16 @@ from services.tts_service import TTSService
 router = APIRouter(prefix="/api/v1/tts", tags=["tts"])
 
 
-def _get_tts_service() -> TTSService:
-    from main import app_state
-
-    service: TTSService = app_state["tts_service"]
-    return service
+def get_tts_service(request: Request) -> TTSService:
+    return request.app.state.tts_service  # type: ignore[no-any-return]
 
 
 @router.post("", response_model=TTSSynthesizeResponse)
 async def synthesize(
     body: TTSSynthesizeRequest,
     _org_roles: dict[str, str] = Depends(get_org_roles),
+    service: TTSService = Depends(get_tts_service),
 ) -> TTSSynthesizeResponse:
-    service = _get_tts_service()
     request = TTSRequest(
         text=body.text,
         language=body.language,
@@ -49,8 +46,8 @@ async def synthesize(
 async def list_voices(
     language: str | None = None,
     _org_roles: dict[str, str] = Depends(get_org_roles),
+    service: TTSService = Depends(get_tts_service),
 ) -> list[VoiceResponse]:
-    service = _get_tts_service()
     voices = await service.list_voices(language)
     return [
         VoiceResponse(id=v.id, name=v.name, language=v.language, gender=v.gender) for v in voices

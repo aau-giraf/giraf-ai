@@ -1,6 +1,5 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import Any
 
 from fastapi import FastAPI
 
@@ -17,8 +16,6 @@ from config.settings import settings
 from core.ports import ImageGeneratorPort, TTSPort
 from services.image_service import ImageService
 from services.tts_service import TTSService
-
-app_state: dict[str, Any] = {}
 
 
 @asynccontextmanager
@@ -45,8 +42,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     else:
         tts_adapter = MockTTSAdapter()
 
-    app_state["image_service"] = ImageService(image_adapter)
-    app_state["tts_service"] = TTSService(tts_adapter)
+    app.state.image_service = ImageService(image_adapter)
+    app.state.tts_service = TTSService(tts_adapter)
     yield
 
 

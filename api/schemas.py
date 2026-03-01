@@ -1,11 +1,15 @@
-from pydantic import BaseModel
+from typing import Annotated, Literal
+
+from pydantic import BaseModel, Field
+
+PositiveInt = Annotated[int, Field(gt=0)]
 
 
 class ImageGenerateRequest(BaseModel):
     prompt: str
-    style: str = "pictogram"
-    size: tuple[int, int] = (512, 512)
-    format: str = "png"
+    style: Literal["pictogram", "realistic", "cartoon"] = "pictogram"
+    size: tuple[PositiveInt, PositiveInt] = (512, 512)
+    format: Literal["png", "webp"] = "png"
 
 
 class ImageGenerateResponse(BaseModel):
@@ -19,7 +23,7 @@ class TTSSynthesizeRequest(BaseModel):
     text: str
     language: str = "da"
     voice: str | None = None
-    format: str = "mp3"
+    format: Literal["mp3", "wav", "ogg"] = "mp3"
 
 
 class TTSSynthesizeResponse(BaseModel):

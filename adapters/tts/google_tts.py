@@ -59,6 +59,8 @@ class GoogleTTSAdapter(TTSPort):
         try:
             resp = await self._client.get("/voices", params=params)
             resp.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            raise ProviderError("google_tts", f"HTTP {e.response.status_code}") from e
         except httpx.RequestError as e:
             raise ProviderError("google_tts", str(e)) from e
 

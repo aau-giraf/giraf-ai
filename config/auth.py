@@ -27,6 +27,12 @@ def get_current_user(
 def get_org_roles(user: dict[str, Any] = Depends(get_current_user)) -> dict[str, str]:
     raw = user.get("org_roles", {})
     if isinstance(raw, str):
-        raw = json.loads(raw)
+        try:
+            raw = json.loads(raw)
+        except (json.JSONDecodeError, TypeError) as e:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Malformed org_roles claim",
+            ) from e
     result: dict[str, str] = raw
     return result

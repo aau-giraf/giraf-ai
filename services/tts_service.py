@@ -19,6 +19,9 @@ class TTSService:
         self.adapter = adapter
         self._prompt_template = _load_tts_prompt()
 
+    async def health_check(self) -> bool:
+        return await self.adapter.health_check()
+
     async def synthesize(self, request: TTSRequest) -> TTSResult:
         text = self._prompt_template.format(text=request.text)
         enriched = replace(request, text=text)
