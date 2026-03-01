@@ -25,6 +25,7 @@ Configured via environment variables. Falls back to mock adapters when no keys a
 | Capability | Provider | Env var |
 |------------|----------|---------|
 | Image | OpenAI DALL-E | `IMAGE_PROVIDER=openai_dalle`, `OPENAI_API_KEY` |
+| Image | Google Gemini | `IMAGE_PROVIDER=gemini`, `GEMINI_API_KEY` |
 | TTS | Google Cloud TTS | `TTS_PROVIDER=google_tts`, `GOOGLE_TTS_CREDENTIALS` |
 
 ## Running
@@ -55,6 +56,8 @@ uv run pytest
 | `IMAGE_PROVIDER` | No | `mock` |
 | `TTS_PROVIDER` | No | `mock` |
 | `OPENAI_API_KEY` | If using DALL-E | — |
+| `GEMINI_API_KEY` | If using Gemini | — |
+| `GEMINI_MODEL` | No | `gemini-2.5-flash` |
 | `GOOGLE_TTS_CREDENTIALS` | If using Google TTS | — |
 | `HOST` | No | `0.0.0.0` |
 | `PORT` | No | `8100` |
