@@ -1,20 +1,13 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 
+from api.dependencies import get_image_service, get_tts_service
 from api.schemas import HealthResponse
 from services.image_service import ImageService
 from services.tts_service import TTSService
 
 router = APIRouter(tags=["health"])
-
-
-def get_image_service(request: Request) -> ImageService:
-    return request.app.state.image_service  # type: ignore[no-any-return]
-
-
-def get_tts_service(request: Request) -> TTSService:
-    return request.app.state.tts_service  # type: ignore[no-any-return]
 
 
 @router.get("/api/v1/health", response_model=HealthResponse)

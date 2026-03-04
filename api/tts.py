@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import base64
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 
+from api.dependencies import get_tts_service
 from api.schemas import TTSSynthesizeRequest, TTSSynthesizeResponse, VoiceResponse
 from config.auth import get_org_roles
 from core.exceptions import ProviderError
@@ -11,10 +12,6 @@ from core.types import TTSRequest
 from services.tts_service import TTSService
 
 router = APIRouter(prefix="/api/v1/tts", tags=["tts"])
-
-
-def get_tts_service(request: Request) -> TTSService:
-    return request.app.state.tts_service  # type: ignore[no-any-return]
 
 
 @router.post("", response_model=TTSSynthesizeResponse)

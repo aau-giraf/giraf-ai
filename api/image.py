@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import base64
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 
+from api.dependencies import get_image_service
 from api.schemas import ImageGenerateRequest, ImageGenerateResponse
 from config.auth import get_org_roles
 from core.exceptions import ProviderError
@@ -11,10 +12,6 @@ from core.types import ImageGenerationRequest
 from services.image_service import ImageService
 
 router = APIRouter(prefix="/api/v1/generate", tags=["image"])
-
-
-def get_image_service(request: Request) -> ImageService:
-    return request.app.state.image_service  # type: ignore[no-any-return]
 
 
 @router.post("/image", response_model=ImageGenerateResponse)
