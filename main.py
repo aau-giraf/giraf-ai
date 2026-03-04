@@ -2,6 +2,8 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+from starlette.requests import Request
 
 from adapters.image.gemini import GeminiImageAdapter
 from adapters.image.mock import MockImageAdapter
@@ -13,6 +15,7 @@ from api.health import router as health_router
 from api.image import router as image_router
 from api.tts import router as tts_router
 from config.settings import settings
+from core.exceptions import AuthenticationError, MalformedClaimError, ProviderError
 from core.ports import ImageGeneratorPort, TTSPort
 from services.image_service import ImageService
 from services.tts_service import TTSService
@@ -48,6 +51,25 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="GIRAF AI", version="0.1.0", lifespan=lifespan)
+
+
+@app.exception_handler(AuthenticationError)
+async def auth_error_handler(_request: Request, exc: AuthenticationError) -> JSONResponse:
+    return JSONResponse(status_code=401, content={"detail": str(exc)})
+
+
+@app.exception_handler(MalformedClaimError)
+async def malformed_claim_handler(
+    _request: Request, exc: MalformedClaimError
+) -> JSONResponse:
+    return JSONResponse(status_code=401, content={"detail": str(exc)})
+
+
+@app.exception_handler(ProviderError)
+async def provider_error_handler(_request: Request, exc: ProviderError) -> JSONResponse:
+    return JSONResponse(status_code=502, content={"detail": str(exc)})
+
+
 app.include_router(image_router)
 app.include_router(tts_router)
 app.include_router(health_router)

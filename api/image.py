@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import base64
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 
 from api.dependencies import get_image_service
 from api.schemas import ImageGenerateRequest, ImageGenerateResponse
 from config.auth import get_org_roles
-from core.exceptions import ProviderError
 from core.types import ImageGenerationRequest
 from services.image_service import ImageService
 
@@ -26,10 +25,7 @@ async def generate_image(
         size=body.size,
         format=body.format,
     )
-    try:
-        result = await service.generate(request)
-    except ProviderError as e:
-        raise HTTPException(status_code=502, detail=str(e)) from e
+    result = await service.generate(request)
 
     return ImageGenerateResponse(
         image_base64=base64.b64encode(result.image_data).decode(),

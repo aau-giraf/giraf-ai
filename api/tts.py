@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import base64
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 
 from api.dependencies import get_tts_service
 from api.schemas import TTSSynthesizeRequest, TTSSynthesizeResponse, VoiceResponse
 from config.auth import get_org_roles
-from core.exceptions import ProviderError
 from core.types import TTSRequest
 from services.tts_service import TTSService
 
@@ -26,10 +25,7 @@ async def synthesize(
         voice=body.voice,
         format=body.format,
     )
-    try:
-        result = await service.synthesize(request)
-    except ProviderError as e:
-        raise HTTPException(status_code=502, detail=str(e)) from e
+    result = await service.synthesize(request)
 
     return TTSSynthesizeResponse(
         audio_base64=base64.b64encode(result.audio_data).decode(),
