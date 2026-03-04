@@ -29,22 +29,22 @@ class ImageService:
     async def generate(self, request: ImageGenerationRequest) -> ImageGenerationResult:
         enriched = self._build_prompt(request)
         result = await self.adapter.generate(enriched)
-        return self._post_process(result, request)
+        return self._ensure_size(result, request.size)
 
     def _build_prompt(self, request: ImageGenerationRequest) -> ImageGenerationRequest:
         template = self._style_prompts.get(request.style, "{prompt}")
         enriched_prompt = template.format(prompt=request.prompt)
         return replace(request, prompt=enriched_prompt)
 
-    def _post_process(
-        self, result: ImageGenerationResult, request: ImageGenerationRequest
+    def _ensure_size(
+        self, result: ImageGenerationResult, target_size: tuple[int, int]
     ) -> ImageGenerationResult:
-        if result.format == request.format:
-            img = Image.open(io.BytesIO(result.image_data))
-            if img.size != request.size:
-                resized = img.resize(request.size, Image.Resampling.LANCZOS)
-                buf = io.BytesIO()
-                pil_fmt = "PNG" if request.format == "png" else "WEBP"
-                resized.save(buf, format=pil_fmt)
-                return replace(result, image_data=buf.getvalue())
-        return result
+        """Resize the generated image to match the requested dimensions."""
+        img = Image.open(io.BytesIO(result.image_data))
+        if img.size == target_size:
+            return result
+        resized = img.resize(target_size, Image.Resampling.LANCZOS)
+        buf = io.BytesIO()
+        pil_fmt = "PNG" if result.format == "png" else "WEBP"
+        resized.save(buf, format=pil_fmt)
+        return replace(result, image_data=buf.getvalue())
