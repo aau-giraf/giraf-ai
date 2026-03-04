@@ -57,9 +57,7 @@ async def auth_error_handler(_request: Request, exc: AuthenticationError) -> JSO
 
 
 @app.exception_handler(MalformedClaimError)
-async def malformed_claim_handler(
-    _request: Request, exc: MalformedClaimError
-) -> JSONResponse:
+async def malformed_claim_handler(_request: Request, exc: MalformedClaimError) -> JSONResponse:
     return JSONResponse(status_code=401, content={"detail": str(exc)})
 
 

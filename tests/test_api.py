@@ -1,4 +1,8 @@
+from unittest.mock import AsyncMock, patch
+
 from fastapi.testclient import TestClient
+
+from core.exceptions import ProviderError
 
 
 def test_health(client: TestClient) -> None:
@@ -50,3 +54,35 @@ def test_tts_voices(client: TestClient, auth_header: dict[str, str]) -> None:
 def test_tts_requires_auth(client: TestClient) -> None:
     resp = client.post("/api/v1/tts", json={"text": "test"})
     assert resp.status_code == 401
+
+
+def test_generate_image_provider_error_returns_502(
+    client: TestClient, auth_header: dict[str, str]
+) -> None:
+    with patch(
+        "services.image_service.ImageService.generate",
+        new_callable=AsyncMock,
+        side_effect=ProviderError("test", "boom"),
+    ):
+        resp = client.post(
+            "/api/v1/generate/image",
+            json={"prompt": "fail"},
+            headers=auth_header,
+        )
+    assert resp.status_code == 502
+    assert "boom" in resp.json()["detail"]
+
+
+def test_tts_provider_error_returns_502(client: TestClient, auth_header: dict[str, str]) -> None:
+    with patch(
+        "services.tts_service.TTSService.synthesize",
+        new_callable=AsyncMock,
+        side_effect=ProviderError("test", "boom"),
+    ):
+        resp = client.post(
+            "/api/v1/tts",
+            json={"text": "fail", "language": "da"},
+            headers=auth_header,
+        )
+    assert resp.status_code == 502
+    assert "boom" in resp.json()["detail"]

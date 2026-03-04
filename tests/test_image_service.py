@@ -36,3 +36,8 @@ async def test_unknown_style_passes_through(image_service: ImageService) -> None
     req = ImageGenerationRequest(prompt="dog", style="unknown_style")
     enriched = image_service._build_prompt(req)
     assert enriched.prompt == "dog"
+
+
+async def test_health_check_delegates_to_adapter(image_service: ImageService) -> None:
+    result = await image_service.health_check()
+    assert result is True

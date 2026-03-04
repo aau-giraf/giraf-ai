@@ -27,3 +27,8 @@ async def test_list_voices_filtered(tts_service: TTSService) -> None:
     voices = await tts_service.list_voices(language="da")
     assert len(voices) == 1
     assert voices[0].language == "da"
+
+
+async def test_health_check_delegates_to_adapter(tts_service: TTSService) -> None:
+    result = await tts_service.health_check()
+    assert result is True
