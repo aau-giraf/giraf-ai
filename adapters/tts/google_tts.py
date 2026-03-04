@@ -43,7 +43,10 @@ class GoogleTTSAdapter(TTSPort):
             raise ProviderError("google_tts", str(e)) from e
 
         data = resp.json()
-        audio_bytes = base64.b64decode(data["audioContent"])
+        try:
+            audio_bytes = base64.b64decode(data["audioContent"])
+        except (KeyError, TypeError) as e:
+            raise ProviderError("google_tts", "No audio in response") from e
 
         return TTSResult(
             audio_data=audio_bytes,

@@ -42,7 +42,10 @@ class OpenAIDalleAdapter(ImageGeneratorPort):
             raise ProviderError("openai_dalle", str(e)) from e
 
         data = resp.json()
-        image_b64 = data["data"][0]["b64_json"]
+        try:
+            image_b64 = data["data"][0]["b64_json"]
+        except (KeyError, IndexError) as e:
+            raise ProviderError("openai_dalle", "No image in response") from e
         image_bytes = base64.b64decode(image_b64)
 
         return ImageGenerationResult(
