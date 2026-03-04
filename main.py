@@ -1,4 +1,4 @@
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -20,30 +20,28 @@ from core.ports import ImageGeneratorPort, TTSPort
 from services.image_service import ImageService
 from services.tts_service import TTSService
 
+_IMAGE_ADAPTERS: dict[str, Callable[[], ImageGeneratorPort]] = {
+    "openai_dalle": lambda: OpenAIDalleAdapter(api_key=settings.openai_api_key),
+    "gemini": lambda: GeminiImageAdapter(
+        api_key=settings.gemini_api_key, model=settings.gemini_model
+    ),
+}
+
+_TTS_ADAPTERS: dict[str, Callable[[], TTSPort]] = {
+    "google_tts": lambda: GoogleTTSAdapter(api_key=settings.google_tts_credentials),
+    "gemini_tts": lambda: GeminiTTSAdapter(
+        api_key=settings.gemini_api_key, model=settings.gemini_tts_model
+    ),
+}
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    # Image adapter
-    image_adapter: ImageGeneratorPort
-    if settings.image_provider == "openai_dalle":
-        image_adapter = OpenAIDalleAdapter(api_key=settings.openai_api_key)
-    elif settings.image_provider == "gemini":
-        image_adapter = GeminiImageAdapter(
-            api_key=settings.gemini_api_key, model=settings.gemini_model
-        )
-    else:
-        image_adapter = MockImageAdapter()
+    image_factory = _IMAGE_ADAPTERS.get(settings.image_provider)
+    image_adapter = image_factory() if image_factory else MockImageAdapter()
 
-    # TTS adapter
-    tts_adapter: TTSPort
-    if settings.tts_provider == "google_tts":
-        tts_adapter = GoogleTTSAdapter(api_key=settings.google_tts_credentials)
-    elif settings.tts_provider == "gemini_tts":
-        tts_adapter = GeminiTTSAdapter(
-            api_key=settings.gemini_api_key, model=settings.gemini_tts_model
-        )
-    else:
-        tts_adapter = MockTTSAdapter()
+    tts_factory = _TTS_ADAPTERS.get(settings.tts_provider)
+    tts_adapter = tts_factory() if tts_factory else MockTTSAdapter()
 
     app.state.image_service = ImageService(image_adapter)
     app.state.tts_service = TTSService(tts_adapter)
