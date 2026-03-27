@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     gemini_tts_model: str = "gemini-2.5-flash-preview-tts"
     google_tts_credentials: str = ""
 
+    cors_allowed_origins: list[str] = []
+
     host: str = "0.0.0.0"
     port: int = 8100
 
