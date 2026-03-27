@@ -3,34 +3,32 @@ from __future__ import annotations
 import base64
 
 from fastapi import APIRouter, Depends, Request
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 
 from api.dependencies import get_tts_service
 from api.schemas import TTSSynthesizeRequest, TTSSynthesizeResponse, VoiceResponse
 from config.auth import get_org_roles
+from config.rate_limit import limiter
 from core.types import TTSRequest
 from services.tts_service import TTSService
 
 router = APIRouter(prefix="/api/v1/tts", tags=["tts"])
-limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("", response_model=TTSSynthesizeResponse)
 @limiter.limit("20/minute")
 async def synthesize(
-    request: Request,
+    request: Request,  # noqa: ARG001  # required by slowapi limiter
     body: TTSSynthesizeRequest,
     _org_roles: dict[str, str] = Depends(get_org_roles),
     service: TTSService = Depends(get_tts_service),
 ) -> TTSSynthesizeResponse:
-    request = TTSRequest(
+    tts_request = TTSRequest(
         text=body.text,
         language=body.language,
         voice=body.voice,
         format=body.format,
     )
-    result = await service.synthesize(request)
+    result = await service.synthesize(tts_request)
 
     return TTSSynthesizeResponse(
         audio_base64=base64.b64encode(result.audio_data).decode(),

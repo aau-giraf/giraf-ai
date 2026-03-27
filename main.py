@@ -4,9 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
 from starlette.requests import Request
 
 from adapters.image.gemini import GeminiImageAdapter
@@ -18,6 +16,7 @@ from adapters.tts.mock import MockTTSAdapter
 from api.health import router as health_router
 from api.image import router as image_router
 from api.tts import router as tts_router
+from config.rate_limit import limiter
 from config.settings import settings
 from core.exceptions import AuthenticationError, MalformedClaimError, ProviderError
 from core.ports import ImageGeneratorPort, TTSPort
@@ -60,8 +59,6 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-limiter = Limiter(key_func=get_remote_address)
-
 app = FastAPI(
     title="GIRAF AI",
     version="0.1.0",
@@ -71,7 +68,11 @@ app = FastAPI(
     openapi_url="/openapi.json" if settings.debug else None,
 )
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(_request: Request, exc: RateLimitExceeded) -> JSONResponse:
+    return JSONResponse(status_code=429, content={"detail": f"Rate limit exceeded: {exc.detail}"})
 
 if settings.cors_allowed_origins:
     app.add_middleware(
