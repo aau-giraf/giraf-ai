@@ -37,10 +37,15 @@ def _pcm_to_wav(pcm: bytes, sample_rate: int = 24000) -> bytes:
 
 
 class GeminiTTSAdapter(TTSPort):
-    def __init__(self, api_key: str, model: str = "gemini-2.5-flash-preview-tts") -> None:
+    def __init__(
+        self,
+        api_key: str,
+        model: str = "gemini-2.5-flash-preview-tts",
+        base_url: str = "https://generativelanguage.googleapis.com/v1beta",
+    ) -> None:
         self._model = model
         self._client = httpx.AsyncClient(
-            base_url="https://generativelanguage.googleapis.com/v1beta",
+            base_url=base_url,
             headers={"x-goog-api-key": api_key},
             timeout=30.0,
         )

@@ -10,10 +10,13 @@ class Settings(BaseSettings):
     tts_provider: str = "mock"  # "mock" | "google_tts" | "gemini_tts"
 
     openai_api_key: str = ""
+    openai_base_url: str = "https://api.openai.com/v1"
     gemini_api_key: str = ""
+    gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
     gemini_model: str = "gemini-2.5-flash-image"
     gemini_tts_model: str = "gemini-2.5-flash-preview-tts"
     google_tts_credentials: str = ""
+    google_tts_base_url: str = "https://texttospeech.googleapis.com/v1"
 
     cors_allowed_origins: list[str] = []
 

@@ -17,10 +17,15 @@ _ASPECT_RATIO_MAP = {
 
 
 class GeminiImageAdapter(ImageGeneratorPort):
-    def __init__(self, api_key: str, model: str = "gemini-2.5-flash-image") -> None:
+    def __init__(
+        self,
+        api_key: str,
+        model: str = "gemini-2.5-flash-image",
+        base_url: str = "https://generativelanguage.googleapis.com/v1beta",
+    ) -> None:
         self._model = model
         self._client = httpx.AsyncClient(
-            base_url="https://generativelanguage.googleapis.com/v1beta",
+            base_url=base_url,
             headers={"x-goog-api-key": api_key},
             timeout=60.0,
         )

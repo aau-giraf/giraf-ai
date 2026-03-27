@@ -22,16 +22,24 @@ from services.image_service import ImageService
 from services.tts_service import TTSService
 
 _IMAGE_ADAPTERS: dict[str, Callable[[], ImageGeneratorPort]] = {
-    "openai_dalle": lambda: OpenAIDalleAdapter(api_key=settings.openai_api_key),
+    "openai_dalle": lambda: OpenAIDalleAdapter(
+        api_key=settings.openai_api_key, base_url=settings.openai_base_url
+    ),
     "gemini": lambda: GeminiImageAdapter(
-        api_key=settings.gemini_api_key, model=settings.gemini_model
+        api_key=settings.gemini_api_key,
+        model=settings.gemini_model,
+        base_url=settings.gemini_base_url,
     ),
 }
 
 _TTS_ADAPTERS: dict[str, Callable[[], TTSPort]] = {
-    "google_tts": lambda: GoogleTTSAdapter(api_key=settings.google_tts_credentials),
+    "google_tts": lambda: GoogleTTSAdapter(
+        api_key=settings.google_tts_credentials, base_url=settings.google_tts_base_url
+    ),
     "gemini_tts": lambda: GeminiTTSAdapter(
-        api_key=settings.gemini_api_key, model=settings.gemini_tts_model
+        api_key=settings.gemini_api_key,
+        model=settings.gemini_tts_model,
+        base_url=settings.gemini_base_url,
     ),
 }
 

@@ -14,9 +14,11 @@ _FORMAT_MAP = {
 
 
 class GoogleTTSAdapter(TTSPort):
-    def __init__(self, api_key: str) -> None:
+    def __init__(
+        self, api_key: str, base_url: str = "https://texttospeech.googleapis.com/v1"
+    ) -> None:
         self._client = httpx.AsyncClient(
-            base_url="https://texttospeech.googleapis.com/v1",
+            base_url=base_url,
             params={"key": api_key},
             timeout=30.0,
         )

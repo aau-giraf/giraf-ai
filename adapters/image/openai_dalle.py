@@ -14,10 +14,10 @@ _SIZE_MAP = {
 
 
 class OpenAIDalleAdapter(ImageGeneratorPort):
-    def __init__(self, api_key: str) -> None:
+    def __init__(self, api_key: str, base_url: str = "https://api.openai.com/v1") -> None:
         self._api_key = api_key
         self._client = httpx.AsyncClient(
-            base_url="https://api.openai.com/v1",
+            base_url=base_url,
             headers={"Authorization": f"Bearer {api_key}"},
             timeout=60.0,
         )
