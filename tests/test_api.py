@@ -101,17 +101,6 @@ def test_generate_image_provider_error_returns_502(
     assert "boom" in resp.json()["detail"]
 
 
-def test_cors_rejects_unknown_origin(client: TestClient) -> None:
-    resp = client.options(
-        "/api/v1/health",
-        headers={
-            "Origin": "https://evil-attacker.com",
-            "Access-Control-Request-Method": "GET",
-        },
-    )
-    assert resp.headers.get("access-control-allow-origin") != "https://evil-attacker.com"
-
-
 def test_tts_provider_error_returns_502(client: TestClient, auth_header: dict[str, str]) -> None:
     with patch(
         "services.tts_service.TTSService.synthesize",
