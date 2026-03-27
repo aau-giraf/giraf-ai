@@ -1,3 +1,4 @@
+import logging
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 
@@ -22,6 +23,8 @@ from core.exceptions import AuthenticationError, MalformedClaimError, ProviderEr
 from core.ports import ImageGeneratorPort, TTSPort
 from services.image_service import ImageService
 from services.tts_service import TTSService
+
+logger = logging.getLogger(__name__)
 
 _IMAGE_ADAPTERS: dict[str, Callable[[], ImageGeneratorPort]] = {
     "openai_dalle": lambda: OpenAIDalleAdapter(
@@ -56,6 +59,21 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     app.state.image_service = ImageService(image_adapter)
     app.state.tts_service = TTSService(tts_adapter)
+
+    image_ok = await image_adapter.health_check()
+    tts_ok = await tts_adapter.health_check()
+    if not image_ok:
+        logger.warning(
+            "Image provider '%s' failed health check at startup", settings.image_provider
+        )
+    if not tts_ok:
+        logger.warning(
+            "TTS provider '%s' failed health check at startup — TTS requests will return 502. "
+            "If using google_tts, ensure GOOGLE_TTS_CREDENTIALS has Cloud TTS API enabled, "
+            "or switch to TTS_PROVIDER=gemini_tts to use the Gemini API key instead.",
+            settings.tts_provider,
+        )
+
     yield
 
 
