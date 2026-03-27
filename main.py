@@ -49,7 +49,14 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-app = FastAPI(title="GIRAF AI", version="0.1.0", lifespan=lifespan)
+app = FastAPI(
+    title="GIRAF AI",
+    version="0.1.0",
+    lifespan=lifespan,
+    docs_url="/docs" if settings.debug else None,
+    redoc_url=None,
+    openapi_url="/openapi.json" if settings.debug else None,
+)
 
 if settings.cors_allowed_origins:
     app.add_middleware(
