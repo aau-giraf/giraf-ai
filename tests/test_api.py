@@ -106,6 +106,21 @@ def test_docs_disabled_by_default(client: TestClient) -> None:
     assert client.get("/openapi.json").status_code == 404
 
 
+def test_image_rate_limit_returns_429(client: TestClient, auth_header: dict[str, str]) -> None:
+    for _ in range(10):
+        client.post(
+            "/api/v1/generate/image",
+            json={"prompt": "test"},
+            headers=auth_header,
+        )
+    resp = client.post(
+        "/api/v1/generate/image",
+        json={"prompt": "one too many"},
+        headers=auth_header,
+    )
+    assert resp.status_code == 429
+
+
 def test_tts_provider_error_returns_502(client: TestClient, auth_header: dict[str, str]) -> None:
     with patch(
         "services.tts_service.TTSService.synthesize",
