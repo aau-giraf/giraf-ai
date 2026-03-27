@@ -92,6 +92,7 @@ app.state.limiter = limiter
 async def rate_limit_handler(_request: Request, exc: RateLimitExceeded) -> JSONResponse:
     return JSONResponse(status_code=429, content={"detail": f"Rate limit exceeded: {exc.detail}"})
 
+
 if settings.cors_allowed_origins:
     app.add_middleware(
         CORSMiddleware,
