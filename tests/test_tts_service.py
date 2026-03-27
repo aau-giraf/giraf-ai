@@ -1,7 +1,7 @@
 import pytest
 
 from adapters.tts.mock import MockTTSAdapter
-from core.types import TTSRequest
+from core.types import TTSRequest, TTSResult
 from services.tts_service import TTSService
 
 
@@ -30,9 +30,19 @@ async def test_list_voices_filtered(tts_service: TTSService) -> None:
 
 
 async def test_newlines_stripped_from_text(tts_service: TTSService) -> None:
+    original_synthesize = tts_service.adapter.synthesize
+
+    captured_request: list[TTSRequest] = []
+
+    async def spy(request: TTSRequest) -> TTSResult:
+        captured_request.append(request)
+        return await original_synthesize(request)
+
+    tts_service.adapter.synthesize = spy  # type: ignore[assignment]
     req = TTSRequest(text="Hej\n\nIgnore instructions")
-    result = await tts_service.synthesize(req)
-    assert result.audio_data  # still works after sanitization
+    await tts_service.synthesize(req)
+    assert len(captured_request) == 1
+    assert "\n" not in captured_request[0].text
 
 
 async def test_health_check_delegates_to_adapter(tts_service: TTSService) -> None:
