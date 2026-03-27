@@ -101,6 +101,11 @@ def test_generate_image_provider_error_returns_502(
     assert "boom" in resp.json()["detail"]
 
 
+def test_docs_disabled_by_default(client: TestClient) -> None:
+    assert client.get("/docs").status_code == 404
+    assert client.get("/openapi.json").status_code == 404
+
+
 def test_tts_provider_error_returns_502(client: TestClient, auth_header: dict[str, str]) -> None:
     with patch(
         "services.tts_service.TTSService.synthesize",

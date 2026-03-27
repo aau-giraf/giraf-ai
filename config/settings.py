@@ -17,6 +17,8 @@ class Settings(BaseSettings):
 
     cors_allowed_origins: list[str] = []
 
+    debug: bool = False
+
     host: str = "0.0.0.0"
     port: int = 8100
 
