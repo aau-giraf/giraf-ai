@@ -30,6 +30,34 @@ def test_generate_image(client: TestClient, auth_header: dict[str, str]) -> None
     assert data["image_base64"]
     assert data["format"] == "png"
     assert data["provider"] == "mock"
+    assert "prompt_used" not in data
+
+
+def test_generate_image_prompt_too_long(client: TestClient, auth_header: dict[str, str]) -> None:
+    resp = client.post(
+        "/api/v1/generate/image",
+        json={"prompt": "a" * 501},
+        headers=auth_header,
+    )
+    assert resp.status_code == 422
+
+
+def test_generate_image_prompt_empty(client: TestClient, auth_header: dict[str, str]) -> None:
+    resp = client.post(
+        "/api/v1/generate/image",
+        json={"prompt": ""},
+        headers=auth_header,
+    )
+    assert resp.status_code == 422
+
+
+def test_tts_text_too_long(client: TestClient, auth_header: dict[str, str]) -> None:
+    resp = client.post(
+        "/api/v1/tts",
+        json={"text": "a" * 2001, "language": "da"},
+        headers=auth_header,
+    )
+    assert resp.status_code == 422
 
 
 def test_tts_synthesize(client: TestClient, auth_header: dict[str, str]) -> None:

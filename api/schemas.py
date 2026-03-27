@@ -6,7 +6,7 @@ PositiveInt = Annotated[int, Field(gt=0)]
 
 
 class ImageGenerateRequest(BaseModel):
-    prompt: str
+    prompt: Annotated[str, Field(min_length=1, max_length=500)]
     style: Literal["pictogram", "realistic", "cartoon"] = "pictogram"
     size: tuple[PositiveInt, PositiveInt] = (512, 512)
     format: Literal["png", "webp"] = "png"
@@ -15,12 +15,11 @@ class ImageGenerateRequest(BaseModel):
 class ImageGenerateResponse(BaseModel):
     image_base64: str
     format: str
-    prompt_used: str
     provider: str
 
 
 class TTSSynthesizeRequest(BaseModel):
-    text: str
+    text: Annotated[str, Field(min_length=1, max_length=2000)]
     language: str = "da"
     voice: str | None = None
     format: Literal["mp3", "wav", "ogg"] = "mp3"

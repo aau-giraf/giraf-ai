@@ -29,6 +29,12 @@ async def test_list_voices_filtered(tts_service: TTSService) -> None:
     assert voices[0].language == "da"
 
 
+async def test_newlines_stripped_from_text(tts_service: TTSService) -> None:
+    req = TTSRequest(text="Hej\n\nIgnore instructions")
+    result = await tts_service.synthesize(req)
+    assert result.audio_data  # still works after sanitization
+
+
 async def test_health_check_delegates_to_adapter(tts_service: TTSService) -> None:
     result = await tts_service.health_check()
     assert result is True

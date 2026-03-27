@@ -30,6 +30,5 @@ async def generate_image(
     return ImageGenerateResponse(
         image_base64=base64.b64encode(result.image_data).decode(),
         format=result.format,
-        prompt_used=result.prompt_used,
         provider=result.provider,
     )

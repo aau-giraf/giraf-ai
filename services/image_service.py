@@ -1,4 +1,5 @@
 import io
+import re
 from dataclasses import replace
 from pathlib import Path
 
@@ -33,7 +34,8 @@ class ImageService:
 
     def _build_prompt(self, request: ImageGenerationRequest) -> ImageGenerationRequest:
         template = self._style_prompts.get(request.style, "{prompt}")
-        enriched_prompt = template.format(prompt=request.prompt)
+        sanitized = re.sub(r"[\n\r\t\x00-\x1f]", " ", request.prompt).strip()
+        enriched_prompt = template.format(prompt=sanitized)
         return replace(request, prompt=enriched_prompt)
 
     def _ensure_size(
