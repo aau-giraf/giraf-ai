@@ -1,8 +1,9 @@
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    jwt_secret: str = "change-me"
+    jwt_secret: str = Field(min_length=32)
     jwt_algorithm: str = "HS256"
 
     image_provider: str = "mock"  # "mock" | "openai_dalle" | "gemini"
