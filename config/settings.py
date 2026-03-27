@@ -21,4 +21,4 @@ class Settings(BaseSettings):
     model_config = {"env_file": ".env", "env_prefix": "", "case_sensitive": False}
 
 
-settings = Settings()
+settings = Settings()  # type: ignore[call-arg]  # pydantic-settings populates from .env

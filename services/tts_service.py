@@ -1,3 +1,4 @@
+import re
 from dataclasses import replace
 from pathlib import Path
 
@@ -23,7 +24,8 @@ class TTSService:
         return await self.adapter.health_check()
 
     async def synthesize(self, request: TTSRequest) -> TTSResult:
-        text = self._prompt_template.format(text=request.text)
+        sanitized = re.sub(r"[\n\r\t\x00-\x1f]", " ", request.text).strip()
+        text = self._prompt_template.format(text=sanitized)
         enriched = replace(request, text=text)
         return await self.adapter.synthesize(enriched)
 
