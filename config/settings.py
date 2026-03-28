@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
 
     image_provider: str = "mock"  # "mock" | "openai_dalle" | "gemini"
-    tts_provider: str = "mock"  # "mock" | "google_tts" | "gemini_tts"
+    tts_provider: str = "mock"  # "mock" | "google_tts" | "gemini_tts" | "plapre"
 
     openai_api_key: str = ""
     openai_base_url: str = "https://api.openai.com/v1"
@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     gemini_tts_model: str = "gemini-2.5-flash-preview-tts"
     google_tts_credentials: str = ""
     google_tts_base_url: str = "https://texttospeech.googleapis.com/v1"
+    plapre_base_url: str = "http://localhost:8200"
 
     cors_allowed_origins: list[str] = []
 

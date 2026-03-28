@@ -14,6 +14,7 @@ from adapters.image.openai_dalle import OpenAIDalleAdapter
 from adapters.tts.gemini_tts import GeminiTTSAdapter
 from adapters.tts.google_tts import GoogleTTSAdapter
 from adapters.tts.mock import MockTTSAdapter
+from adapters.tts.plapre import PlapreAdapter
 from api.health import router as health_router
 from api.image import router as image_router
 from api.tts import router as tts_router
@@ -46,6 +47,7 @@ _TTS_ADAPTERS: dict[str, Callable[[], TTSPort]] = {
         model=settings.gemini_tts_model,
         base_url=settings.gemini_base_url,
     ),
+    "plapre": lambda: PlapreAdapter(base_url=settings.plapre_base_url),
 }
 
 
