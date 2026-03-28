@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     google_tts_credentials: str = ""
     google_tts_base_url: str = "https://texttospeech.googleapis.com/v1"
     plapre_base_url: str = "http://localhost:8200"
+    imagegen_base_url: str = "http://localhost:8300"
 
     cors_allowed_origins: list[str] = []
 
