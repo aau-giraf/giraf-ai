@@ -9,6 +9,7 @@ from slowapi.errors import RateLimitExceeded
 from starlette.requests import Request
 
 from adapters.image.gemini import GeminiImageAdapter
+from adapters.image.imagegen import ImagegenAdapter
 from adapters.image.mock import MockImageAdapter
 from adapters.image.openai_dalle import OpenAIDalleAdapter
 from adapters.tts.gemini_tts import GeminiTTSAdapter
@@ -36,6 +37,7 @@ _IMAGE_ADAPTERS: dict[str, Callable[[], ImageGeneratorPort]] = {
         model=settings.gemini_model,
         base_url=settings.gemini_base_url,
     ),
+    "imagegen": lambda: ImagegenAdapter(base_url=settings.imagegen_base_url),
 }
 
 _TTS_ADAPTERS: dict[str, Callable[[], TTSPort]] = {
