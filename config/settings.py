@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(min_length=32)
     jwt_algorithm: str = "HS256"
 
-    image_provider: str = "mock"  # "mock" | "openai_dalle" | "gemini"
+    image_provider: str = "mock"  # "mock" | "openai_dalle" | "gemini" | "imagegen"
     tts_provider: str = "mock"  # "mock" | "google_tts" | "gemini_tts" | "plapre"
 
     openai_api_key: str = ""
