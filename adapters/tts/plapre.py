@@ -62,6 +62,8 @@ class PlapreAdapter(TTSPort):
         try:
             resp = await self._client.get("/v1/speakers")
             resp.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            raise ProviderError("plapre", f"HTTP {e.response.status_code}") from e
         except httpx.RequestError as e:
             raise ProviderError("plapre", str(e)) from e
 
