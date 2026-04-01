@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Any
 
 from fastapi import APIRouter, Depends, Request
 
@@ -19,7 +20,7 @@ router = APIRouter(prefix="/api/v1/generate", tags=["image"])
 async def generate_image(
     request: Request,  # noqa: ARG001  # required by slowapi limiter
     body: ImageGenerateRequest,
-    _user: dict[str, object] = Depends(get_current_user),
+    _user: dict[str, Any] = Depends(get_current_user),
     service: ImageService = Depends(get_image_service),
 ) -> ImageGenerateResponse:
     gen_request = ImageGenerationRequest(

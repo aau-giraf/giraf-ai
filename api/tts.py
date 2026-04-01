@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+from typing import Any
 
 from fastapi import APIRouter, Depends, Request
 
@@ -19,7 +20,7 @@ router = APIRouter(prefix="/api/v1/tts", tags=["tts"])
 async def synthesize(
     request: Request,  # noqa: ARG001  # required by slowapi limiter
     body: TTSSynthesizeRequest,
-    _user: dict[str, object] = Depends(get_current_user),
+    _user: dict[str, Any] = Depends(get_current_user),
     service: TTSService = Depends(get_tts_service),
 ) -> TTSSynthesizeResponse:
     tts_request = TTSRequest(
@@ -41,7 +42,7 @@ async def synthesize(
 @router.get("/voices", response_model=list[VoiceResponse])
 async def list_voices(
     language: str | None = None,
-    _user: dict[str, object] = Depends(get_current_user),
+    _user: dict[str, Any] = Depends(get_current_user),
     service: TTSService = Depends(get_tts_service),
 ) -> list[VoiceResponse]:
     voices = await service.list_voices(language)
