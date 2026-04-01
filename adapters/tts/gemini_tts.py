@@ -1,10 +1,10 @@
 import base64
-import io
-import struct
 
 import httpx
 
+from core.audio import pcm_to_wav
 from core.exceptions import ProviderError
+from core.http import provider_request
 from core.ports import TTSPort
 from core.types import TTSRequest, TTSResult, VoiceInfo
 
@@ -19,21 +19,6 @@ _GEMINI_VOICES = [
     VoiceInfo(id="Orus", name="Orus", language="en", gender="male"),
     VoiceInfo(id="Zephyr", name="Zephyr", language="en", gender="female"),
 ]
-
-
-def _pcm_to_wav(pcm: bytes, sample_rate: int = 24000) -> bytes:
-    """Wrap raw 16-bit mono PCM in a WAV header."""
-    buf = io.BytesIO()
-    data_size = len(pcm)
-    buf.write(b"RIFF")
-    buf.write(struct.pack("<I", 36 + data_size))
-    buf.write(b"WAVE")
-    buf.write(b"fmt ")
-    buf.write(struct.pack("<IHHIIHH", 16, 1, 1, sample_rate, sample_rate * 2, 2, 16))
-    buf.write(b"data")
-    buf.write(struct.pack("<I", data_size))
-    buf.write(pcm)
-    return buf.getvalue()
 
 
 class GeminiTTSAdapter(TTSPort):
@@ -52,33 +37,29 @@ class GeminiTTSAdapter(TTSPort):
 
     async def synthesize(self, request: TTSRequest) -> TTSResult:
         voice_name = request.voice or "Kore"
-        try:
-            resp = await self._client.post(
-                f"/models/{self._model}:generateContent",
-                json={
-                    "contents": [{"parts": [{"text": request.text}]}],
-                    "generationConfig": {
-                        "responseModalities": ["AUDIO"],
-                        "speechConfig": {
-                            "voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voice_name}}
-                        },
+        async with provider_request(
+            self._client,
+            "post",
+            f"/models/{self._model}:generateContent",
+            "gemini_tts",
+            json={
+                "contents": [{"parts": [{"text": request.text}]}],
+                "generationConfig": {
+                    "responseModalities": ["AUDIO"],
+                    "speechConfig": {
+                        "voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voice_name}}
                     },
                 },
-            )
-            resp.raise_for_status()
-        except httpx.HTTPStatusError as e:
-            raise ProviderError("gemini_tts", f"HTTP {e.response.status_code}") from e
-        except httpx.RequestError as e:
-            raise ProviderError("gemini_tts", str(e)) from e
-
-        data = resp.json()
+            },
+        ) as resp:
+            data = resp.json()
         try:
             inline = data["candidates"][0]["content"]["parts"][0]["inlineData"]
         except (KeyError, IndexError) as e:
             raise ProviderError("gemini_tts", "No audio in response") from e
 
         pcm = base64.b64decode(inline["data"])
-        wav = _pcm_to_wav(pcm)
+        wav = pcm_to_wav(pcm)
 
         return TTSResult(
             audio_data=wav,

@@ -3,6 +3,7 @@ import base64
 import httpx
 
 from core.exceptions import ProviderError
+from core.http import provider_request
 from core.ports import ImageGeneratorPort
 from core.types import ImageGenerationRequest, ImageGenerationResult
 
@@ -32,24 +33,20 @@ class GeminiImageAdapter(ImageGeneratorPort):
 
     async def generate(self, request: ImageGenerationRequest) -> ImageGenerationResult:
         aspect_ratio = _ASPECT_RATIO_MAP.get(request.size, "1:1")
-        try:
-            resp = await self._client.post(
-                f"/models/{self._model}:generateContent",
-                json={
-                    "contents": [{"parts": [{"text": request.prompt}]}],
-                    "generationConfig": {
-                        "responseModalities": ["TEXT", "IMAGE"],
-                        "imageConfig": {"aspectRatio": aspect_ratio},
-                    },
+        async with provider_request(
+            self._client,
+            "post",
+            f"/models/{self._model}:generateContent",
+            "gemini",
+            json={
+                "contents": [{"parts": [{"text": request.prompt}]}],
+                "generationConfig": {
+                    "responseModalities": ["TEXT", "IMAGE"],
+                    "imageConfig": {"aspectRatio": aspect_ratio},
                 },
-            )
-            resp.raise_for_status()
-        except httpx.HTTPStatusError as e:
-            raise ProviderError("gemini", f"HTTP {e.response.status_code}") from e
-        except httpx.RequestError as e:
-            raise ProviderError("gemini", str(e)) from e
-
-        data = resp.json()
+            },
+        ) as resp:
+            data = resp.json()
         try:
             parts = data["candidates"][0]["content"]["parts"]
             inline = next(p["inlineData"] for p in parts if "inlineData" in p)
