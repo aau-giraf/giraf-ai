@@ -21,6 +21,8 @@ class ImageGeneratorPort(ABC):
 
 
 class TTSPort(ABC):
+    supported_formats: frozenset[str] = frozenset({"mp3", "wav", "ogg"})
+
     @abstractmethod
     async def synthesize(self, request: TTSRequest) -> TTSResult: ...
 

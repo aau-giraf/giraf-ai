@@ -1,6 +1,7 @@
 import pytest
 
 from adapters.tts.mock import MockTTSAdapter
+from core.exceptions import UnsupportedFormatError
 from core.types import TTSRequest, TTSResult
 from services.tts_service import TTSService
 
@@ -47,6 +48,22 @@ async def test_newlines_stripped_from_text(tts_service: TTSService) -> None:
 
 async def test_curly_braces_in_text_do_not_raise(tts_service: TTSService) -> None:
     req = TTSRequest(text="Say {hello} loudly")
+    result = await tts_service.synthesize(req)
+    assert result.audio_data
+
+
+async def test_unsupported_format_raises_error() -> None:
+    """Adapter with restricted formats rejects unsupported format requests."""
+    adapter = MockTTSAdapter()
+    adapter.supported_formats = frozenset({"wav"})
+    service = TTSService(adapter)
+    req = TTSRequest(text="test", format="mp3")
+    with pytest.raises(UnsupportedFormatError, match="mp3"):
+        await service.synthesize(req)
+
+
+async def test_supported_format_passes_validation(tts_service: TTSService) -> None:
+    req = TTSRequest(text="test", format="wav")
     result = await tts_service.synthesize(req)
     assert result.audio_data
 

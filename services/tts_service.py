@@ -2,6 +2,7 @@ import re
 from dataclasses import replace
 from pathlib import Path
 
+from core.exceptions import UnsupportedFormatError
 from core.ports import TTSPort
 from core.types import TTSRequest, TTSResult, VoiceInfo
 
@@ -24,6 +25,12 @@ class TTSService:
         return await self.adapter.health_check()
 
     async def synthesize(self, request: TTSRequest) -> TTSResult:
+        if request.format not in self.adapter.supported_formats:
+            supported = ", ".join(sorted(self.adapter.supported_formats))
+            raise UnsupportedFormatError(
+                f"Format '{request.format}' is not supported by the active TTS provider. "
+                f"Supported formats: {supported}"
+            )
         sanitized = re.sub(r"[\n\r\t\x00-\x1f]", " ", request.text).strip()
         text = self._prompt_template.replace("{text}", sanitized)
         enriched = replace(request, text=text)

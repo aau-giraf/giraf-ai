@@ -21,7 +21,12 @@ from api.image import router as image_router
 from api.tts import router as tts_router
 from config.rate_limit import limiter
 from config.settings import settings
-from core.exceptions import AuthenticationError, MalformedClaimError, ProviderError
+from core.exceptions import (
+    AuthenticationError,
+    MalformedClaimError,
+    ProviderError,
+    UnsupportedFormatError,
+)
 from core.ports import ImageGeneratorPort, TTSPort
 from core.providers import ImageProvider, TTSProvider
 from services.image_service import ImageService
@@ -120,6 +125,13 @@ async def auth_error_handler(_request: Request, exc: AuthenticationError) -> JSO
 @app.exception_handler(MalformedClaimError)
 async def malformed_claim_handler(_request: Request, exc: MalformedClaimError) -> JSONResponse:
     return JSONResponse(status_code=401, content={"detail": str(exc)})
+
+
+@app.exception_handler(UnsupportedFormatError)
+async def unsupported_format_handler(
+    _request: Request, exc: UnsupportedFormatError
+) -> JSONResponse:
+    return JSONResponse(status_code=422, content={"detail": str(exc)})
 
 
 @app.exception_handler(ProviderError)
