@@ -16,6 +16,9 @@ class ImageGeneratorPort(ABC):
     @abstractmethod
     async def health_check(self) -> bool: ...
 
+    async def close(self) -> None:
+        """Release resources (e.g. HTTP clients). Override in adapters that hold connections."""
+
 
 class TTSPort(ABC):
     @abstractmethod
@@ -26,3 +29,6 @@ class TTSPort(ABC):
 
     @abstractmethod
     async def health_check(self) -> bool: ...
+
+    async def close(self) -> None:
+        """Release resources (e.g. HTTP clients). Override in adapters that hold connections."""

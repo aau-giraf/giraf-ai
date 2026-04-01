@@ -82,3 +82,6 @@ class PlapreAdapter(TTSPort):
             return resp.status_code == 200
         except httpx.RequestError:
             return False
+
+    async def close(self) -> None:
+        await self._client.aclose()

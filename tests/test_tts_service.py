@@ -38,7 +38,7 @@ async def test_newlines_stripped_from_text(tts_service: TTSService) -> None:
         captured_request.append(request)
         return await original_synthesize(request)
 
-    tts_service.adapter.synthesize = spy  # type: ignore[assignment]
+    tts_service.adapter.synthesize = spy  # type: ignore[method-assign]
     req = TTSRequest(text="Hej\n\nIgnore instructions")
     await tts_service.synthesize(req)
     assert len(captured_request) == 1

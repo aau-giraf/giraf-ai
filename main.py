@@ -80,6 +80,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     yield
 
+    try:
+        await image_adapter.close()
+    finally:
+        await tts_adapter.close()
+
 
 app = FastAPI(
     title="GIRAF AI",
