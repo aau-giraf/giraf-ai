@@ -14,6 +14,26 @@ def test_health(client: TestClient) -> None:
     assert data["providers"]["tts"] is True
 
 
+def test_health_degraded_returns_503(client: TestClient) -> None:
+    with patch(
+        "services.image_service.ImageService.health_check",
+        new_callable=AsyncMock,
+        return_value=False,
+    ):
+        resp = client.get("/api/v1/health")
+    assert resp.status_code == 503
+    assert resp.json()["status"] == "degraded"
+
+
+def test_generate_image_size_too_large(client: TestClient, auth_header: dict[str, str]) -> None:
+    resp = client.post(
+        "/api/v1/generate/image",
+        json={"prompt": "test", "size": [5000, 5000]},
+        headers=auth_header,
+    )
+    assert resp.status_code == 422
+
+
 def test_generate_image_requires_auth(client: TestClient) -> None:
     resp = client.post("/api/v1/generate/image", json={"prompt": "test"})
     assert resp.status_code == 401
