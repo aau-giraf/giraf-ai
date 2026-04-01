@@ -35,7 +35,7 @@ class ImageService:
     def _build_prompt(self, request: ImageGenerationRequest) -> ImageGenerationRequest:
         template = self._style_prompts.get(request.style, "{prompt}")
         sanitized = re.sub(r"[\n\r\t\x00-\x1f]", " ", request.prompt).strip()
-        enriched_prompt = template.format(prompt=sanitized)
+        enriched_prompt = template.replace("{prompt}", sanitized)
         return replace(request, prompt=enriched_prompt)
 
     def _ensure_size(

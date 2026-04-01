@@ -45,6 +45,12 @@ async def test_newlines_stripped_from_text(tts_service: TTSService) -> None:
     assert "\n" not in captured_request[0].text
 
 
+async def test_curly_braces_in_text_do_not_raise(tts_service: TTSService) -> None:
+    req = TTSRequest(text="Say {hello} loudly")
+    result = await tts_service.synthesize(req)
+    assert result.audio_data
+
+
 async def test_health_check_delegates_to_adapter(tts_service: TTSService) -> None:
     result = await tts_service.health_check()
     assert result is True

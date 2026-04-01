@@ -55,6 +55,13 @@ async def test_control_chars_stripped_from_prompt(image_service: ImageService) -
     assert "\x00" not in enriched.prompt
 
 
+async def test_curly_braces_in_prompt_do_not_raise(image_service: ImageService) -> None:
+    req = ImageGenerationRequest(prompt="a {cat} and {dog} playing")
+    enriched = image_service._build_prompt(req)
+    assert "{cat}" in enriched.prompt
+    assert "{dog}" in enriched.prompt
+
+
 async def test_health_check_delegates_to_adapter(image_service: ImageService) -> None:
     result = await image_service.health_check()
     assert result is True
