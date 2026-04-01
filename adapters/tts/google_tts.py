@@ -5,6 +5,7 @@ import httpx
 from core.exceptions import ProviderError
 from core.http import provider_request
 from core.ports import TTSPort
+from core.providers import TTSProvider
 from core.types import TTSRequest, TTSResult, VoiceInfo
 
 _FORMAT_MAP = {
@@ -34,7 +35,7 @@ class GoogleTTSAdapter(TTSPort):
             self._client,
             "post",
             "/text:synthesize",
-            "google_tts",
+            TTSProvider.GOOGLE_TTS,
             json={
                 "input": {"text": request.text},
                 "voice": voice_config,
@@ -45,13 +46,13 @@ class GoogleTTSAdapter(TTSPort):
         try:
             audio_bytes = base64.b64decode(data["audioContent"])
         except (KeyError, TypeError) as e:
-            raise ProviderError("google_tts", "No audio in response") from e
+            raise ProviderError(TTSProvider.GOOGLE_TTS, "No audio in response") from e
 
         return TTSResult(
             audio_data=audio_bytes,
             format=request.format,
             duration_ms=None,
-            provider="google_tts",
+            provider=TTSProvider.GOOGLE_TTS,
         )
 
     async def list_voices(self, language: str | None = None) -> list[VoiceInfo]:
@@ -59,7 +60,7 @@ class GoogleTTSAdapter(TTSPort):
         if language:
             params["languageCode"] = language
         async with provider_request(
-            self._client, "get", "/voices", "google_tts", params=params
+            self._client, "get", "/voices", TTSProvider.GOOGLE_TTS, params=params
         ) as resp:
             voice_data = resp.json()
 

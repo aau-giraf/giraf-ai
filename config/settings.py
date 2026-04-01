@@ -1,13 +1,15 @@
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
+from core.providers import ImageProvider, TTSProvider
+
 
 class Settings(BaseSettings):
     jwt_secret: str = Field(min_length=32)
     jwt_algorithm: str = "HS256"
 
-    image_provider: str = "mock"  # "mock" | "openai_dalle" | "gemini" | "imagegen"
-    tts_provider: str = "mock"  # "mock" | "google_tts" | "gemini_tts" | "plapre"
+    image_provider: ImageProvider = ImageProvider.MOCK
+    tts_provider: TTSProvider = TTSProvider.MOCK
 
     openai_api_key: str = ""
     openai_base_url: str = "https://api.openai.com/v1"

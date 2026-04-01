@@ -1,5 +1,6 @@
 from core.audio import make_wav_silence
 from core.ports import TTSPort
+from core.providers import TTSProvider
 from core.types import TTSRequest, TTSResult, VoiceInfo
 
 
@@ -13,7 +14,7 @@ class MockTTSAdapter(TTSPort):
             audio_data=audio,
             format="wav",
             duration_ms=duration_ms,
-            provider="mock",
+            provider=TTSProvider.MOCK,
         )
 
     async def list_voices(self, language: str | None = None) -> list[VoiceInfo]:

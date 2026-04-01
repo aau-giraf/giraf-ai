@@ -23,33 +23,34 @@ from config.rate_limit import limiter
 from config.settings import settings
 from core.exceptions import AuthenticationError, MalformedClaimError, ProviderError
 from core.ports import ImageGeneratorPort, TTSPort
+from core.providers import ImageProvider, TTSProvider
 from services.image_service import ImageService
 from services.tts_service import TTSService
 
 logger = logging.getLogger(__name__)
 
-_IMAGE_ADAPTERS: dict[str, Callable[[], ImageGeneratorPort]] = {
-    "openai_dalle": lambda: OpenAIDalleAdapter(
+_IMAGE_ADAPTERS: dict[ImageProvider, Callable[[], ImageGeneratorPort]] = {
+    ImageProvider.OPENAI_DALLE: lambda: OpenAIDalleAdapter(
         api_key=settings.openai_api_key, base_url=settings.openai_base_url
     ),
-    "gemini": lambda: GeminiImageAdapter(
+    ImageProvider.GEMINI: lambda: GeminiImageAdapter(
         api_key=settings.gemini_api_key,
         model=settings.gemini_model,
         base_url=settings.gemini_base_url,
     ),
-    "imagegen": lambda: ImagegenAdapter(base_url=settings.imagegen_base_url),
+    ImageProvider.IMAGEGEN: lambda: ImagegenAdapter(base_url=settings.imagegen_base_url),
 }
 
-_TTS_ADAPTERS: dict[str, Callable[[], TTSPort]] = {
-    "google_tts": lambda: GoogleTTSAdapter(
+_TTS_ADAPTERS: dict[TTSProvider, Callable[[], TTSPort]] = {
+    TTSProvider.GOOGLE_TTS: lambda: GoogleTTSAdapter(
         api_key=settings.google_tts_credentials, base_url=settings.google_tts_base_url
     ),
-    "gemini_tts": lambda: GeminiTTSAdapter(
+    TTSProvider.GEMINI_TTS: lambda: GeminiTTSAdapter(
         api_key=settings.gemini_api_key,
         model=settings.gemini_tts_model,
         base_url=settings.gemini_base_url,
     ),
-    "plapre": lambda: PlapreAdapter(base_url=settings.plapre_base_url),
+    TTSProvider.PLAPRE: lambda: PlapreAdapter(base_url=settings.plapre_base_url),
 }
 
 
