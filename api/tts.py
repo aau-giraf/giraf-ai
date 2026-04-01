@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import base64
+from typing import Any
 
 from fastapi import APIRouter, Depends, Request
 
 from api.dependencies import get_tts_service
 from api.schemas import TTSSynthesizeRequest, TTSSynthesizeResponse, VoiceResponse
-from config.auth import get_org_roles
+from config.auth import get_current_user
 from config.rate_limit import limiter
 from core.types import TTSRequest
 from services.tts_service import TTSService
@@ -19,7 +20,7 @@ router = APIRouter(prefix="/api/v1/tts", tags=["tts"])
 async def synthesize(
     request: Request,  # noqa: ARG001  # required by slowapi limiter
     body: TTSSynthesizeRequest,
-    _org_roles: dict[str, str] = Depends(get_org_roles),
+    _user: dict[str, Any] = Depends(get_current_user),
     service: TTSService = Depends(get_tts_service),
 ) -> TTSSynthesizeResponse:
     tts_request = TTSRequest(
@@ -41,7 +42,7 @@ async def synthesize(
 @router.get("/voices", response_model=list[VoiceResponse])
 async def list_voices(
     language: str | None = None,
-    _org_roles: dict[str, str] = Depends(get_org_roles),
+    _user: dict[str, Any] = Depends(get_current_user),
     service: TTSService = Depends(get_tts_service),
 ) -> list[VoiceResponse]:
     voices = await service.list_voices(language)

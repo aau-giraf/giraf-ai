@@ -23,7 +23,6 @@ from config.rate_limit import limiter
 from config.settings import settings
 from core.exceptions import (
     AuthenticationError,
-    MalformedClaimError,
     ProviderError,
     UnsupportedFormatError,
 )
@@ -119,11 +118,6 @@ if settings.cors_allowed_origins:
 
 @app.exception_handler(AuthenticationError)
 async def auth_error_handler(_request: Request, exc: AuthenticationError) -> JSONResponse:
-    return JSONResponse(status_code=401, content={"detail": str(exc)})
-
-
-@app.exception_handler(MalformedClaimError)
-async def malformed_claim_handler(_request: Request, exc: MalformedClaimError) -> JSONResponse:
     return JSONResponse(status_code=401, content={"detail": str(exc)})
 
 
