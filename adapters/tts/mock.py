@@ -12,7 +12,7 @@ class MockTTSAdapter(TTSPort):
         audio = make_wav_silence(duration_ms)
         return TTSResult(
             audio_data=audio,
-            format="wav",
+            format=request.format,
             duration_ms=duration_ms,
             provider=TTSProvider.MOCK,
         )

@@ -12,6 +12,8 @@ PLAPRE_SAMPLE_RATE = 24000
 class PlapreAdapter(TTSPort):
     """TTS adapter for Plapre Danish TTS running on a GPU server."""
 
+    supported_formats = frozenset({"wav"})
+
     def __init__(self, base_url: str = "http://localhost:8200") -> None:
         self._client = httpx.AsyncClient(
             base_url=base_url,

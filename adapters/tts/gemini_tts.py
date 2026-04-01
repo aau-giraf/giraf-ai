@@ -23,6 +23,8 @@ _GEMINI_VOICES = [
 
 
 class GeminiTTSAdapter(TTSPort):
+    supported_formats = frozenset({"wav"})
+
     def __init__(
         self,
         api_key: str,

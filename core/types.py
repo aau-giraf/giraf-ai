@@ -24,7 +24,7 @@ class TTSRequest:
     text: str
     language: str = "da"
     voice: str | None = None
-    format: str = "mp3"
+    format: str = "wav"
 
 
 @dataclass

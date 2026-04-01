@@ -16,3 +16,7 @@ class AuthenticationError(GirafAIError):
 
 class MalformedClaimError(GirafAIError):
     """Raised when a JWT claim has an unexpected format."""
+
+
+class UnsupportedFormatError(GirafAIError):
+    """Raised when a requested format is not supported by the active provider."""

@@ -22,7 +22,7 @@ class TTSSynthesizeRequest(BaseModel):
     text: Annotated[str, Field(min_length=1, max_length=2000)]
     language: str = "da"
     voice: str | None = None
-    format: Literal["mp3", "wav", "ogg"] = "mp3"
+    format: Literal["mp3", "wav", "ogg"] = "wav"
 
 
 class TTSSynthesizeResponse(BaseModel):
