@@ -80,8 +80,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     yield
 
-    await image_adapter.close()
-    await tts_adapter.close()
+    try:
+        await image_adapter.close()
+    finally:
+        await tts_adapter.close()
 
 
 app = FastAPI(
