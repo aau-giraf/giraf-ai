@@ -2,6 +2,7 @@
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from typing import Literal
 
 import httpx
 
@@ -11,7 +12,7 @@ from core.exceptions import ProviderError
 @asynccontextmanager
 async def provider_request(
     client: httpx.AsyncClient,
-    method: str,
+    method: Literal["get", "post", "put", "patch", "delete"],
     url: str,
     provider: str,
     **kwargs: object,
