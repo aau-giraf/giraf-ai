@@ -33,7 +33,11 @@ target-version = "py312"
 line-length = 100
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "UP"]
+select = ["E", "F", "I", "N", "W", "UP", "B", "A", "RUF", "SIM", "ARG"]
+ignore = [
+    "B008",  # Depends() in defaults is idiomatic FastAPI
+    "B027",  # Empty methods in ABCs are intentional default no-ops
+]
 
 [tool.mypy]
 python_version = "3.12"
