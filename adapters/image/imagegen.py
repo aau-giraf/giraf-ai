@@ -1,6 +1,6 @@
 import httpx
 
-from core.exceptions import ProviderError
+from core.http import provider_request
 from core.ports import ImageGeneratorPort
 from core.types import ImageGenerationRequest, ImageGenerationResult
 
@@ -22,16 +22,13 @@ class ImagegenAdapter(ImageGeneratorPort):
             "format": request.format,
         }
 
-        try:
-            resp = await self._client.post("/v1/image/generate", json=body)
-            resp.raise_for_status()
-        except httpx.HTTPStatusError as e:
-            raise ProviderError("imagegen", f"HTTP {e.response.status_code}") from e
-        except httpx.RequestError as e:
-            raise ProviderError("imagegen", str(e)) from e
+        async with provider_request(
+            self._client, "post", "/v1/image/generate", "imagegen", json=body
+        ) as resp:
+            content = resp.content
 
         return ImageGenerationResult(
-            image_data=resp.content,
+            image_data=content,
             format=request.format,
             prompt_used=request.prompt,
             provider="imagegen",

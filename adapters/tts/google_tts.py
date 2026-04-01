@@ -3,6 +3,7 @@ import base64
 import httpx
 
 from core.exceptions import ProviderError
+from core.http import provider_request
 from core.ports import TTSPort
 from core.types import TTSRequest, TTSResult, VoiceInfo
 
@@ -29,22 +30,18 @@ class GoogleTTSAdapter(TTSPort):
         if request.voice:
             voice_config["name"] = request.voice
 
-        try:
-            resp = await self._client.post(
-                "/text:synthesize",
-                json={
-                    "input": {"text": request.text},
-                    "voice": voice_config,
-                    "audioConfig": {"audioEncoding": audio_encoding},
-                },
-            )
-            resp.raise_for_status()
-        except httpx.HTTPStatusError as e:
-            raise ProviderError("google_tts", f"HTTP {e.response.status_code}") from e
-        except httpx.RequestError as e:
-            raise ProviderError("google_tts", str(e)) from e
-
-        data = resp.json()
+        async with provider_request(
+            self._client,
+            "post",
+            "/text:synthesize",
+            "google_tts",
+            json={
+                "input": {"text": request.text},
+                "voice": voice_config,
+                "audioConfig": {"audioEncoding": audio_encoding},
+            },
+        ) as resp:
+            data = resp.json()
         try:
             audio_bytes = base64.b64decode(data["audioContent"])
         except (KeyError, TypeError) as e:
@@ -61,16 +58,13 @@ class GoogleTTSAdapter(TTSPort):
         params = {}
         if language:
             params["languageCode"] = language
-        try:
-            resp = await self._client.get("/voices", params=params)
-            resp.raise_for_status()
-        except httpx.HTTPStatusError as e:
-            raise ProviderError("google_tts", f"HTTP {e.response.status_code}") from e
-        except httpx.RequestError as e:
-            raise ProviderError("google_tts", str(e)) from e
+        async with provider_request(
+            self._client, "get", "/voices", "google_tts", params=params
+        ) as resp:
+            voice_data = resp.json()
 
         voices = []
-        for v in resp.json().get("voices", []):
+        for v in voice_data.get("voices", []):
             voices.append(
                 VoiceInfo(
                     id=v["name"],

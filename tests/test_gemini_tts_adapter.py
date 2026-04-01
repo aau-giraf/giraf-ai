@@ -4,7 +4,8 @@ from unittest.mock import AsyncMock, patch
 import httpx
 import pytest
 
-from adapters.tts.gemini_tts import GeminiTTSAdapter, _pcm_to_wav
+from adapters.tts.gemini_tts import GeminiTTSAdapter
+from core.audio import pcm_to_wav
 from core.exceptions import ProviderError
 from core.types import TTSRequest
 
@@ -121,7 +122,7 @@ async def test_list_voices_filters_by_language(adapter: GeminiTTSAdapter) -> Non
 
 def test_pcm_to_wav_header() -> None:
     pcm = b"\x00\x00" * 48000  # 2 seconds at 24kHz
-    wav = _pcm_to_wav(pcm)
+    wav = pcm_to_wav(pcm)
     assert wav[:4] == b"RIFF"
     assert wav[8:12] == b"WAVE"
     assert wav[44:] == pcm
