@@ -25,7 +25,7 @@ class TTSService:
 
     async def synthesize(self, request: TTSRequest) -> TTSResult:
         sanitized = re.sub(r"[\n\r\t\x00-\x1f]", " ", request.text).strip()
-        text = self._prompt_template.format(text=sanitized)
+        text = self._prompt_template.replace("{text}", sanitized)
         enriched = replace(request, text=text)
         return await self.adapter.synthesize(enriched)
 
