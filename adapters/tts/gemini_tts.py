@@ -6,6 +6,7 @@ from core.audio import pcm_to_wav
 from core.exceptions import ProviderError
 from core.http import provider_request
 from core.ports import TTSPort
+from core.providers import TTSProvider
 from core.types import TTSRequest, TTSResult, VoiceInfo
 
 # Gemini TTS voices — no list endpoint exists, so these are hardcoded.
@@ -41,7 +42,7 @@ class GeminiTTSAdapter(TTSPort):
             self._client,
             "post",
             f"/models/{self._model}:generateContent",
-            "gemini_tts",
+            TTSProvider.GEMINI_TTS,
             json={
                 "contents": [{"parts": [{"text": request.text}]}],
                 "generationConfig": {
@@ -56,7 +57,7 @@ class GeminiTTSAdapter(TTSPort):
         try:
             inline = data["candidates"][0]["content"]["parts"][0]["inlineData"]
         except (KeyError, IndexError) as e:
-            raise ProviderError("gemini_tts", "No audio in response") from e
+            raise ProviderError(TTSProvider.GEMINI_TTS, "No audio in response") from e
 
         pcm = base64.b64decode(inline["data"])
         wav = pcm_to_wav(pcm)
@@ -65,7 +66,7 @@ class GeminiTTSAdapter(TTSPort):
             audio_data=wav,
             format="wav",
             duration_ms=None,
-            provider="gemini_tts",
+            provider=TTSProvider.GEMINI_TTS,
         )
 
     async def list_voices(self, language: str | None = None) -> list[VoiceInfo]:

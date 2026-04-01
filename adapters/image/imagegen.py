@@ -2,6 +2,7 @@ import httpx
 
 from core.http import provider_request
 from core.ports import ImageGeneratorPort
+from core.providers import ImageProvider
 from core.types import ImageGenerationRequest, ImageGenerationResult
 
 
@@ -23,7 +24,7 @@ class ImagegenAdapter(ImageGeneratorPort):
         }
 
         async with provider_request(
-            self._client, "post", "/v1/image/generate", "imagegen", json=body
+            self._client, "post", "/v1/image/generate", ImageProvider.IMAGEGEN, json=body
         ) as resp:
             content = resp.content
 
@@ -31,7 +32,7 @@ class ImagegenAdapter(ImageGeneratorPort):
             image_data=content,
             format=request.format,
             prompt_used=request.prompt,
-            provider="imagegen",
+            provider=ImageProvider.IMAGEGEN,
             metadata=request.metadata,
         )
 

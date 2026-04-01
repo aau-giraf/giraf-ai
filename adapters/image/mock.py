@@ -3,6 +3,7 @@ import io
 from PIL import Image, ImageDraw
 
 from core.ports import ImageGeneratorPort
+from core.providers import ImageProvider
 from core.types import ImageGenerationRequest, ImageGenerationResult
 
 
@@ -22,7 +23,7 @@ class MockImageAdapter(ImageGeneratorPort):
             image_data=buf.getvalue(),
             format=request.format,
             prompt_used=request.prompt,
-            provider="mock",
+            provider=ImageProvider.MOCK,
             metadata=request.metadata,
         )
 

@@ -5,6 +5,7 @@ import httpx
 from core.exceptions import ProviderError
 from core.http import provider_request
 from core.ports import ImageGeneratorPort
+from core.providers import ImageProvider
 from core.types import ImageGenerationRequest, ImageGenerationResult
 
 _ASPECT_RATIO_MAP = {
@@ -37,7 +38,7 @@ class GeminiImageAdapter(ImageGeneratorPort):
             self._client,
             "post",
             f"/models/{self._model}:generateContent",
-            "gemini",
+            ImageProvider.GEMINI,
             json={
                 "contents": [{"parts": [{"text": request.prompt}]}],
                 "generationConfig": {
@@ -51,7 +52,7 @@ class GeminiImageAdapter(ImageGeneratorPort):
             parts = data["candidates"][0]["content"]["parts"]
             inline = next(p["inlineData"] for p in parts if "inlineData" in p)
         except (KeyError, IndexError, StopIteration) as e:
-            raise ProviderError("gemini", "No image in response") from e
+            raise ProviderError(ImageProvider.GEMINI, "No image in response") from e
 
         image_bytes = base64.b64decode(inline["data"])
         mime = inline.get("mimeType", "image/png")
@@ -61,7 +62,7 @@ class GeminiImageAdapter(ImageGeneratorPort):
             image_data=image_bytes,
             format=fmt,
             prompt_used=request.prompt,
-            provider="gemini",
+            provider=ImageProvider.GEMINI,
             metadata=request.metadata,
         )
 

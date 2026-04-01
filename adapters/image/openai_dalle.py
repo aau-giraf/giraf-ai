@@ -5,6 +5,7 @@ import httpx
 from core.exceptions import ProviderError
 from core.http import provider_request
 from core.ports import ImageGeneratorPort
+from core.providers import ImageProvider
 from core.types import ImageGenerationRequest, ImageGenerationResult
 
 _SIZE_MAP = {
@@ -29,7 +30,7 @@ class OpenAIDalleAdapter(ImageGeneratorPort):
             self._client,
             "post",
             "/images/generations",
-            "openai_dalle",
+            ImageProvider.OPENAI_DALLE,
             json={
                 "model": "dall-e-3",
                 "prompt": request.prompt,
@@ -42,14 +43,14 @@ class OpenAIDalleAdapter(ImageGeneratorPort):
         try:
             image_b64 = data["data"][0]["b64_json"]
         except (KeyError, IndexError) as e:
-            raise ProviderError("openai_dalle", "No image in response") from e
+            raise ProviderError(ImageProvider.OPENAI_DALLE, "No image in response") from e
         image_bytes = base64.b64decode(image_b64)
 
         return ImageGenerationResult(
             image_data=image_bytes,
             format="png",
             prompt_used=request.prompt,
-            provider="openai_dalle",
+            provider=ImageProvider.OPENAI_DALLE,
             metadata=request.metadata,
         )
 

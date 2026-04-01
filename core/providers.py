@@ -1,0 +1,17 @@
+"""Provider name constants for image generation and TTS adapters."""
+
+from enum import StrEnum
+
+
+class ImageProvider(StrEnum):
+    MOCK = "mock"
+    OPENAI_DALLE = "openai_dalle"
+    GEMINI = "gemini"
+    IMAGEGEN = "imagegen"
+
+
+class TTSProvider(StrEnum):
+    MOCK = "mock"
+    GOOGLE_TTS = "google_tts"
+    GEMINI_TTS = "gemini_tts"
+    PLAPRE = "plapre"

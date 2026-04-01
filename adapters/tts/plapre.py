@@ -3,6 +3,7 @@ import httpx
 from core.audio import pcm_to_wav
 from core.http import provider_request
 from core.ports import TTSPort
+from core.providers import TTSProvider
 from core.types import TTSRequest, TTSResult, VoiceInfo
 
 PLAPRE_SAMPLE_RATE = 24000
@@ -23,7 +24,7 @@ class PlapreAdapter(TTSPort):
             body["speaker"] = request.voice
 
         async with provider_request(
-            self._client, "post", "/v1/audio/speech", "plapre", json=body
+            self._client, "post", "/v1/audio/speech", TTSProvider.PLAPRE, json=body
         ) as resp:
             pcm = resp.content
         wav = pcm_to_wav(pcm)
@@ -33,12 +34,12 @@ class PlapreAdapter(TTSPort):
             audio_data=wav,
             format="wav",
             duration_ms=duration_ms,
-            provider="plapre",
+            provider=TTSProvider.PLAPRE,
         )
 
     async def list_voices(self, language: str | None = None) -> list[VoiceInfo]:
         async with provider_request(
-            self._client, "get", "/v1/speakers", "plapre"
+            self._client, "get", "/v1/speakers", TTSProvider.PLAPRE
         ) as resp:
             speakers = resp.json().get("speakers", [])
         voices = [
