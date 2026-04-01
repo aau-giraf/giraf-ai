@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 
 from api.dependencies import get_image_service, get_tts_service
 from api.schemas import HealthResponse
@@ -14,9 +15,14 @@ router = APIRouter(tags=["health"])
 async def health(
     image_svc: ImageService = Depends(get_image_service),
     tts_svc: TTSService = Depends(get_tts_service),
-) -> HealthResponse:
+) -> JSONResponse:
     image_ok = await image_svc.health_check()
     tts_ok = await tts_svc.health_check()
     providers = {"image": image_ok, "tts": tts_ok}
-    status = "healthy" if all(providers.values()) else "degraded"
-    return HealthResponse(status=status, providers=providers)
+    is_healthy = all(providers.values())
+    status = "healthy" if is_healthy else "degraded"
+    data = HealthResponse(status=status, providers=providers)
+    return JSONResponse(
+        content=data.model_dump(),
+        status_code=200 if is_healthy else 503,
+    )

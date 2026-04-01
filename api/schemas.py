@@ -2,13 +2,13 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
-PositiveInt = Annotated[int, Field(gt=0)]
+ImageDimension = Annotated[int, Field(gt=0, le=4096)]
 
 
 class ImageGenerateRequest(BaseModel):
     prompt: Annotated[str, Field(min_length=1, max_length=500)]
     style: Literal["pictogram", "realistic", "cartoon"] = "pictogram"
-    size: tuple[PositiveInt, PositiveInt] = (512, 512)
+    size: tuple[ImageDimension, ImageDimension] = (512, 512)
     format: Literal["png", "webp"] = "png"
 
 

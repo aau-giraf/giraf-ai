@@ -47,6 +47,6 @@ class ImageService:
             return result
         resized = img.resize(target_size, Image.Resampling.LANCZOS)
         buf = io.BytesIO()
-        pil_fmt = "PNG" if result.format == "png" else "WEBP"
+        pil_fmt = {"png": "PNG", "webp": "WEBP"}.get(result.format, result.format.upper())
         resized.save(buf, format=pil_fmt)
         return replace(result, image_data=buf.getvalue())
