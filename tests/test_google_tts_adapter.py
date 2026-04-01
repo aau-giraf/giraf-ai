@@ -29,7 +29,7 @@ async def test_synthesize_returns_audio(adapter: GoogleTTSAdapter) -> None:
         result = await adapter.synthesize(req)
 
     assert result.audio_data == b"audio-data"
-    assert result.format == "mp3"
+    assert result.format == "wav"
     assert result.provider == "google_tts"
 
 
