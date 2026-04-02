@@ -17,8 +17,6 @@ class Settings(BaseSettings):
     gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
     gemini_model: str = "gemini-2.5-flash-image"
     gemini_tts_model: str = "gemini-2.5-flash-preview-tts"
-    google_tts_credentials: str = ""
-    google_tts_base_url: str = "https://texttospeech.googleapis.com/v1"
     plapre_base_url: str = "http://localhost:8200"
     imagegen_base_url: str = "http://localhost:8300"
 
