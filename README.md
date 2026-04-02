@@ -26,7 +26,6 @@ Configured via environment variables. Falls back to mock adapters when no keys a
 |------------|----------|---------|
 | Image | OpenAI DALL-E | `IMAGE_PROVIDER=openai_dalle`, `OPENAI_API_KEY` |
 | Image | Google Gemini | `IMAGE_PROVIDER=gemini`, `GEMINI_API_KEY` |
-| TTS | Google Cloud TTS | `TTS_PROVIDER=google_tts`, `GOOGLE_TTS_CREDENTIALS` |
 | TTS | Google Gemini TTS | `TTS_PROVIDER=gemini_tts`, `GEMINI_API_KEY` |
 
 ## Running
@@ -77,6 +76,5 @@ prompts/
 | `GEMINI_API_KEY` | If using Gemini | — |
 | `GEMINI_MODEL` | No | `gemini-2.5-flash` |
 | `GEMINI_TTS_MODEL` | No | `gemini-2.5-flash-preview-tts` |
-| `GOOGLE_TTS_CREDENTIALS` | If using Google TTS | — |
 | `HOST` | No | `0.0.0.0` |
 | `PORT` | No | `8100` |

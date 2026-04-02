@@ -13,7 +13,6 @@ from adapters.image.imagegen import ImagegenAdapter
 from adapters.image.mock import MockImageAdapter
 from adapters.image.openai_dalle import OpenAIDalleAdapter
 from adapters.tts.gemini_tts import GeminiTTSAdapter
-from adapters.tts.google_tts import GoogleTTSAdapter
 from adapters.tts.mock import MockTTSAdapter
 from adapters.tts.plapre import PlapreAdapter
 from api.health import router as health_router
@@ -46,9 +45,6 @@ _IMAGE_ADAPTERS: dict[ImageProvider, Callable[[], ImageGeneratorPort]] = {
 }
 
 _TTS_ADAPTERS: dict[TTSProvider, Callable[[], TTSPort]] = {
-    TTSProvider.GOOGLE_TTS: lambda: GoogleTTSAdapter(
-        api_key=settings.google_tts_credentials, base_url=settings.google_tts_base_url
-    ),
     TTSProvider.GEMINI_TTS: lambda: GeminiTTSAdapter(
         api_key=settings.gemini_api_key,
         model=settings.gemini_tts_model,
@@ -78,8 +74,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     if not tts_ok:
         logger.warning(
             "TTS provider '%s' failed health check at startup — TTS requests will return 502. "
-            "If using google_tts, ensure GOOGLE_TTS_CREDENTIALS has Cloud TTS API enabled, "
-            "or switch to TTS_PROVIDER=gemini_tts to use the Gemini API key instead.",
+            "Ensure GEMINI_API_KEY is set and valid.",
             settings.tts_provider,
         )
 

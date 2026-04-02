@@ -12,6 +12,5 @@ class ImageProvider(StrEnum):
 
 class TTSProvider(StrEnum):
     MOCK = "mock"
-    GOOGLE_TTS = "google_tts"
     GEMINI_TTS = "gemini_tts"
     PLAPRE = "plapre"
