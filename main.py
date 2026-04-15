@@ -51,6 +51,11 @@ _TTS_ADAPTERS: dict[TTSProvider, Callable[[], TTSPort]] = {
         base_url=settings.gemini_base_url,
     ),
     TTSProvider.PLAPRE: lambda: PlapreAdapter(base_url=settings.plapre_base_url),
+    TTSProvider.PLAPRE_CPU: lambda: PlapreAdapter(
+        base_url=settings.plapre_cpu_base_url,
+        provider=TTSProvider.PLAPRE_CPU,
+        timeout=120.0,
+    ),
 }
 
 

@@ -14,3 +14,4 @@ class TTSProvider(StrEnum):
     MOCK = "mock"
     GEMINI_TTS = "gemini_tts"
     PLAPRE = "plapre"
+    PLAPRE_CPU = "plapre_cpu"

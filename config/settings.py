@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     gemini_model: str = "gemini-2.5-flash-image"
     gemini_tts_model: str = "gemini-2.5-flash-preview-tts"
     plapre_base_url: str = "http://localhost:8200"
+    plapre_cpu_base_url: str = "http://localhost:8201"
     imagegen_base_url: str = "http://localhost:8300"
 
     cors_allowed_origins: list[str] = []
